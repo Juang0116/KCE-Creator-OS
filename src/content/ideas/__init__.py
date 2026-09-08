@@ -1,3 +1,4 @@
+from .engine import ContentIdeaEngineV0
 from .models import (
     ContentAudience,
     ContentConcept,
@@ -8,6 +9,7 @@ from .models import (
 )
 
 __all__ = [
+    "ContentIdeaEngineV0",
     "ContentIdea",
     "ContentConcept",
     "ContentAudience",
