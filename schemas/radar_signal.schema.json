@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KCE Creator OS — Radar Signal",
+  "description": "Canonical signal contract for content opportunity detection.",
+  "type": "object",
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+
+    "signal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "detected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "radar_version": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "source": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "social",
+            "news",
+            "search",
+            "video",
+            "forum",
+            "rss",
+            "other"
+          ]
+        },
+
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+
+        "author": {
+          "type": ["string", "null"]
+        },
+
+        "published_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      },
+
+      "required": [
+        "type",
+        "platform"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "signal": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 10
+        }
+      },
+
+      "required": [
+        "title",
+        "summary",
+        "keywords",
+        "topics",
+        "language"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "engagement": {
+          "type": "object",
+          "properties": {
+            "views": {
+              "type": ["integer", "null"],
+              "minimum": 0
+            },
+
+            "likes": {
+              "type": ["integer", "null"],
+              "minimum": 0
+            },
+
+            "comments": {
+              "type": ["integer", "null"],
+              "minimum": 0
+            },
+
+            "shares": {
+              "type": ["integer", "null"],
+              "minimum": 0
+            }
+          },
+
+          "additionalProperties": false
+        },
+
+        "mentions": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+
+      "additionalProperties": false
+    },
+
+    "relevance": {
+      "type": "object",
+      "properties": {
+        "niches": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "relevance_reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+
+      "required": [
+        "niches",
+        "relevance_reason"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "processing": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "detected",
+            "collected",
+            "analyzed",
+            "promoted",
+            "dismissed",
+            "archived"
+          ]
+        },
+
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "processed_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      },
+
+      "required": [
+        "status",
+        "confidence"
+      ],
+
+      "additionalProperties": false
+    }
+  },
+
+  "required": [
+    "schema_version",
+    "signal_id",
+    "detected_at",
+    "radar_version",
+    "source",
+    "signal",
+    "evidence",
+    "relevance",
+    "processing"
+  ],
+
+  "additionalProperties": false
+}
