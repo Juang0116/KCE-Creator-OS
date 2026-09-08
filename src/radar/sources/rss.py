@@ -1,6 +1,8 @@
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
 
+from src.radar.config import RSSFeedConfig
+
 
 class RSSSource:
     """
@@ -18,10 +20,10 @@ class RSSSource:
 
     def __init__(
         self,
-        feed_url: str,
+        feed_config: RSSFeedConfig,
         timeout: int = 15,
     ):
-        self.feed_url = feed_url
+        self.feed_config = feed_config
         self.timeout = timeout
 
     def fetch(self) -> list[dict]:
@@ -30,7 +32,7 @@ class RSSSource:
         """
 
         request = Request(
-            self.feed_url,
+            self.feed_config.url,
             headers={
                 "User-Agent": "KCE-Creator-OS/0.1",
             },

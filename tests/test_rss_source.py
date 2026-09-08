@@ -5,6 +5,7 @@ from xml.etree import ElementTree as ET
 from jsonschema import Draft202012Validator
 
 from src.radar import RadarV0
+from src.radar.config import RSSFeedConfig
 from src.radar.sources.rss import RSSSource
 
 
@@ -44,11 +45,19 @@ def test_rss_source_parses_item(monkeypatch):
         mock_urlopen,
     )
 
-    source = RSSSource(
-        "https://example.com/feed.xml"
+    feed_config = RSSFeedConfig(
+    name="KCE Test Feed",
+    url="https://example.com/feed.xml",
     )
 
+    source = RSSSource(feed_config)
+
     result = source.fetch()
+
+    assert source.feed_config.name == "KCE Test Feed"
+    assert source.feed_config.url == (
+        "https://example.com/feed.xml"
+    )
 
     assert len(result) == 1
 
@@ -105,9 +114,12 @@ def test_rss_source_integrates_with_radar_and_schema(
         mock_urlopen,
     )
 
-    source = RSSSource(
-        "https://example.com/feed.xml"
+    feed_config = RSSFeedConfig(
+        name="KCE Test Feed",
+        url="https://example.com/feed.xml",
     )
+
+    source = RSSSource(feed_config)
 
     raw_signals = source.fetch()
 
