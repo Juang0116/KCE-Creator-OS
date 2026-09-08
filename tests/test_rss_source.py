@@ -1,5 +1,10 @@
+import json
+from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from jsonschema import Draft202012Validator
+
+from src.radar import RadarV0
 from src.radar.sources.rss import RSSSource
 
 
@@ -77,3 +82,57 @@ def test_rss_source_output_is_compatible_with_radar():
     }
 
     assert required_fields.issubset(signal.keys())
+
+
+def test_rss_source_integrates_with_radar_and_schema(
+    monkeypatch,
+):
+    class MockResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            return False
+
+        def read(self):
+            return SAMPLE_RSS.encode("utf-8")
+
+    def mock_urlopen(request, timeout):
+        return MockResponse()
+
+    monkeypatch.setattr(
+        "src.radar.sources.rss.urlopen",
+        mock_urlopen,
+    )
+
+    source = RSSSource(
+        "https://example.com/feed.xml"
+    )
+
+    raw_signals = source.fetch()
+
+    radar = RadarV0()
+    signals = radar.collect(raw_signals)
+
+    assert len(signals) == 1
+
+    signal_data = signals[0].to_dict()
+
+    schema_path = (
+        Path(__file__).parent.parent
+        / "schemas"
+        / "radar_signal.schema.json"
+    )
+
+    with open(schema_path, "r", encoding="utf-8") as file:
+        schema = json.load(file)
+
+    validator = Draft202012Validator(schema)
+
+    errors = list(
+        validator.iter_errors(signal_data)
+    )
+
+    assert not errors, "\n".join(
+        error.message for error in errors
+    )

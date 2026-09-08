@@ -167,31 +167,28 @@
     },
 
     "relevance": {
-      "type": "object",
-      "properties": {
-        "niches": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "minItems": 1,
-          "uniqueItems": true
-        },
-
-        "relevance_reason": {
-          "type": "string",
-          "minLength": 1
-        }
+  "type": "object",
+  "properties": {
+    "niches": {
+      "type": "array",
+      "items": {
+        "type": "string"
       },
-
-      "required": [
-        "niches",
-        "relevance_reason"
-      ],
-
-      "additionalProperties": false
+      "uniqueItems": true
     },
+
+    "relevance_reason": {
+      "type": "string"
+    }
+  },
+
+  "required": [
+    "niches",
+    "relevance_reason"
+  ],
+
+  "additionalProperties": false
+},
 
     "processing": {
       "type": "object",
