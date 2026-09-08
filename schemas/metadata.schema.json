@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kce-labs.local/schemas/metadata.schema.json",
+  "title": "KCE Creator OS - Metadata Plan",
+  "description": "Schema for publication metadata generated from content production context.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "metadata_plan_id",
+    "created_at",
+    "metadata_plan_version",
+    "source",
+    "target",
+    "metadata",
+    "processing"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "metadata_plan_id": {
+      "type": "string",
+      "pattern": "^metadata_plan_[a-zA-Z0-9_-]+$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata_plan_version": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thumbnail_plan_id",
+        "production_plan_id",
+        "storyboard_id",
+        "script_id",
+        "idea_id",
+        "opportunity_id",
+        "signal_id"
+      ],
+      "properties": {
+        "thumbnail_plan_id": {
+          "type": "string"
+        },
+        "production_plan_id": {
+          "type": "string"
+        },
+        "storyboard_id": {
+          "type": "string"
+        },
+        "script_id": {
+          "type": "string"
+        },
+        "idea_id": {
+          "type": "string"
+        },
+        "opportunity_id": {
+          "type": "string"
+        },
+        "signal_id": {
+          "type": "string"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brand_id",
+        "channel",
+        "platform"
+      ],
+      "properties": {
+        "brand_id": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "keywords",
+        "category",
+        "cta",
+        "language",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "type": "string"
+        },
+        "cta": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "planned",
+            "draft",
+            "review",
+            "approved",
+            "rejected"
+          ]
+        }
+      }
+    },
+    "processing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "confidence",
+        "processed_at"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "review",
+            "approved",
+            "rejected",
+            "archived"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "processed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
