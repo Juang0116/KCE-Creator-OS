@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QA Report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "qa_report_id",
+    "created_at",
+    "qa_version",
+    "source",
+    "checks",
+    "summary",
+    "processing"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "qa_report_id": {
+      "type": "string",
+      "pattern": "^qa_report_[a-zA-Z0-9_-]+$"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "qa_version": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "production_plan_id",
+        "storyboard_id",
+        "asset_plan_id",
+        "voice_plan_id",
+        "music_sfx_plan_id",
+        "script_id",
+        "idea_id",
+        "opportunity_id",
+        "signal_id"
+      ],
+      "properties": {
+        "production_plan_id": {
+          "type": "string"
+        },
+        "storyboard_id": {
+          "type": "string"
+        },
+        "asset_plan_id": {
+          "type": "string"
+        },
+        "voice_plan_id": {
+          "type": "string"
+        },
+        "music_sfx_plan_id": {
+          "type": "string"
+        },
+        "script_id": {
+          "type": "string"
+        },
+        "idea_id": {
+          "type": "string"
+        },
+        "opportunity_id": {
+          "type": "string"
+        },
+        "signal_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "check_id",
+          "category",
+          "name",
+          "status",
+          "severity",
+          "message"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "structure",
+              "references",
+              "assets",
+              "voice",
+              "audio",
+              "timeline",
+              "content",
+              "production"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "warning",
+              "failed"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "overall_status",
+        "total_checks",
+        "passed",
+        "warnings",
+        "failed"
+      ],
+      "properties": {
+        "overall_status": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "passed_with_warnings",
+            "failed"
+          ]
+        },
+        "total_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "processing": {
+      "type": "object",
+      "required": [
+        "status",
+        "confidence",
+        "processed_at"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "review",
+            "approved",
+            "rejected",
+            "archived"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "processed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
