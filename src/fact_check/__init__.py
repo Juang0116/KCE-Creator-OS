@@ -1,3 +1,4 @@
+from .engine import FactCheckEngineV0
 from .models import (
     FactCheck,
     FactCheckCheck,
@@ -7,6 +8,7 @@ from .models import (
 )
 
 __all__ = [
+    "FactCheckEngineV0",
     "FactCheck",
     "FactCheckCheck",
     "FactCheckProcessing",
