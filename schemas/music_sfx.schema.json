@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Music and SFX Plan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "music_sfx_plan_id",
+    "created_at",
+    "music_sfx_plan_version",
+    "source",
+    "target",
+    "tracks",
+    "processing"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "music_sfx_plan_id": {
+      "type": "string",
+      "pattern": "^music_sfx_plan_[a-zA-Z0-9_-]+$"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "music_sfx_plan_version": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "storyboard_id",
+        "script_id",
+        "idea_id",
+        "opportunity_id",
+        "signal_id"
+      ],
+      "properties": {
+        "storyboard_id": {
+          "type": "string"
+        },
+        "script_id": {
+          "type": "string"
+        },
+        "idea_id": {
+          "type": "string"
+        },
+        "opportunity_id": {
+          "type": "string"
+        },
+        "signal_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "brand_id",
+        "channel",
+        "platform"
+      ],
+      "properties": {
+        "brand_id": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tracks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "track_id",
+          "scene_id",
+          "track_type",
+          "description",
+          "purpose",
+          "source_strategy",
+          "priority",
+          "status",
+          "start_time_seconds",
+          "end_time_seconds"
+        ],
+        "properties": {
+          "track_id": {
+            "type": "string"
+          },
+          "scene_id": {
+            "type": "string"
+          },
+          "track_type": {
+            "type": "string",
+            "enum": [
+              "music",
+              "sfx",
+              "ambience",
+              "transition",
+              "other"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "source_strategy": {
+            "type": "string",
+            "enum": [
+              "generate",
+              "retrieve",
+              "create",
+              "reuse"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "needed",
+              "planned",
+              "available",
+              "acquired",
+              "approved",
+              "rejected"
+            ]
+          },
+          "start_time_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end_time_seconds": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "processing": {
+      "type": "object",
+      "required": [
+        "status",
+        "confidence",
+        "processed_at"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "review",
+            "approved",
+            "rejected",
+            "archived"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "processed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
