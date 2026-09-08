@@ -1,3 +1,4 @@
+from .engine import ResearchEngineV0
 from .models import (
     ResearchBrief,
     ResearchFinding,
@@ -8,6 +9,7 @@ from .models import (
 )
 
 __all__ = [
+    "ResearchEngineV0",
     "ResearchBrief",
     "ResearchFinding",
     "ResearchObjective",
