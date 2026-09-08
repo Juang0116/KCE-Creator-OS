@@ -1,0 +1,663 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KCE Creator OS — Brand DNA",
+  "description": "Canonical Brand DNA contract for KCE Creator OS.",
+  "type": "object",
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+
+    "brand_id": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "last_approved_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "paused",
+        "archived"
+      ]
+    },
+
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+
+    "identity": {
+      "type": "object",
+
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "mission": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "vision": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "value_proposition": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "positioning": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+
+      "required": [
+        "name",
+        "mission",
+        "vision",
+        "values",
+        "value_proposition",
+        "positioning"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "market": {
+      "type": "object",
+
+      "properties": {
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "competitors": {
+          "type": "array",
+
+          "items": {
+            "type": "object",
+
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+
+              "platform": {
+                "type": "string",
+                "minLength": 1
+              },
+
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+
+              "strengths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+
+              "weaknesses": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+
+            "required": [
+              "name",
+              "platform",
+              "observed_at"
+            ],
+
+            "additionalProperties": false
+          }
+        },
+
+        "benchmarks": {
+          "type": "array",
+
+          "items": {
+            "type": "object",
+
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+
+              "platform": {
+                "type": "string",
+                "minLength": 1
+              },
+
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+
+            "required": [
+              "name",
+              "platform",
+              "reason",
+              "observed_at"
+            ],
+
+            "additionalProperties": false
+          }
+        },
+
+        "differentiators": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "market_context": {
+          "type": "object",
+
+          "properties": {
+            "summary": {
+              "type": "string",
+              "minLength": 1
+            },
+
+            "trends": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+
+            "opportunities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+
+            "threats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+
+            "observed_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+
+          "required": [
+            "summary",
+            "observed_at"
+          ],
+
+          "additionalProperties": false
+        }
+      },
+
+      "required": [
+        "category",
+        "differentiators"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "audience": {
+      "type": "object",
+
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "age_range": {
+          "type": "object",
+
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0
+            },
+
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+
+          "required": [
+            "min",
+            "max"
+          ],
+
+          "additionalProperties": false
+        },
+
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "problems": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "desires": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "knowledge_level": {
+          "type": "string",
+          "enum": [
+            "beginner",
+            "intermediate",
+            "advanced",
+            "mixed"
+          ]
+        },
+
+        "geography": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 10
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+
+      "required": [
+        "target",
+        "interests",
+        "problems",
+        "desires",
+        "knowledge_level",
+        "languages"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "personality": {
+      "type": "object",
+
+      "properties": {
+        "archetype": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "tone": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "voice": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "attitude": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+
+      "required": [
+        "archetype",
+        "tone",
+        "voice",
+        "attitude"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "content": {
+      "type": "object",
+
+      "properties": {
+        "pillars": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "storytelling": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+
+      "required": [
+        "pillars",
+        "formats",
+        "topics",
+        "storytelling"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "channels_community": {
+      "type": "object",
+
+      "properties": {
+        "primary_platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "content_repurposing": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "engagement_strategy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+
+      "required": [
+        "primary_platforms",
+        "content_repurposing",
+        "engagement_strategy"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "visual": {
+      "type": "object",
+
+      "properties": {
+        "style": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "characters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+
+        "animation": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+
+      "required": [
+        "style",
+        "colors",
+        "characters",
+        "animation"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "rules": {
+      "type": "object",
+
+      "properties": {
+        "do": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "dont": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "sensitive_topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+
+      "required": [
+        "do",
+        "dont",
+        "sensitive_topics"
+      ],
+
+      "additionalProperties": false
+    },
+
+    "business": {
+      "type": "object",
+
+      "properties": {
+        "goals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "monetization": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+
+        "kpis": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+
+      "required": [
+        "goals",
+        "monetization",
+        "kpis"
+      ],
+
+      "additionalProperties": false
+    }
+  },
+
+  "required": [
+    "schema_version",
+    "brand_id",
+    "created_at",
+    "updated_at",
+    "status",
+    "version",
+    "identity",
+    "market",
+    "audience",
+    "personality",
+    "content",
+    "channels_community",
+    "visual",
+    "rules",
+    "business"
+  ],
+
+  "additionalProperties": false
+}
