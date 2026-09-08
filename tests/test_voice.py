@@ -1,50 +1,71 @@
 from src.voice.engine import VoiceEngineV0
 from src.voice.models import VoiceProfile
+from src.script.models import (
+    ScriptSource,
+    ScriptTarget,
+    ScriptHook,
+    ScriptIntroduction,
+    ScriptSection,
+    ScriptConclusion,
+    ScriptCTA,
+)
 
 
 class MockScript:
     script_id = "script_001"
 
-    source = {
-        "idea_id": "idea_001",
-        "opportunity_id": "opportunity_001",
-        "signal_id": "signal_001",
-    }
+    source = ScriptSource(
+        idea_id="idea_001",
+        research_id="research_001",
+        fact_check_id="fact_check_001",
+        opportunity_id="opportunity_001",
+        signal_id="signal_001",
+    )
 
-    target = {
-        "brand_id": "brand_001",
-        "channel": "Futuro Tech",
-        "platform": "youtube",
-    }
+    target = ScriptTarget(
+        brand_id="brand_001",
+        channel="Futuro Tech",
+        platform="youtube",
+    )
 
-    hook = {
-        "narration": "La tecnología está cambiando nuestra forma de crear."
-    }
+    hook = ScriptHook(
+        narration="La tecnología está cambiando nuestra forma de crear.",
+        visual_direction="Show technology examples.",
+    )
 
-    introduction = "Hoy vamos a descubrir cómo funciona este cambio."
+    introduction = ScriptIntroduction(
+        narration="Hoy vamos a descubrir cómo funciona este cambio.",
+        visual_direction="Introduce the topic.",
+    )
 
     sections = [
-        {
-            "section_id": "section_001",
-            "title": "El cambio",
-            "narration": "Las nuevas herramientas permiten producir contenido más rápido.",
-            "claims": [],
-            "visual_direction": "Show technology examples.",
-            "transition": "Continue.",
-        },
-        {
-            "section_id": "section_002",
-            "title": "El futuro",
-            "narration": "El futuro será una combinación entre creatividad humana e inteligencia artificial.",
-            "claims": [],
-            "visual_direction": "Show futuristic creator workflow.",
-            "transition": "Final transition.",
-        },
+        ScriptSection(
+            section_id="section_001",
+            title="El cambio",
+            narration="Las nuevas herramientas permiten producir contenido más rápido.",
+            claims=[],
+            visual_direction="Show technology examples.",
+            transition="Continue.",
+        ),
+        ScriptSection(
+            section_id="section_002",
+            title="El futuro",
+            narration="El futuro será una combinación entre creatividad humana e inteligencia artificial.",
+            claims=[],
+            visual_direction="Show futuristic creator workflow.",
+            transition="Final transition.",
+        ),
     ]
 
-    conclusion = "La tecnología no reemplaza la creatividad: la amplifica."
+    conclusion = ScriptConclusion(
+        narration="La tecnología no reemplaza la creatividad: la amplifica.",
+        visual_direction="Show final creator workflow.",
+    )
 
-    cta = "Suscríbete para aprender más."
+    cta = ScriptCTA(
+        narration="Suscríbete para aprender más.",
+        visual_direction="Show subscribe CTA.",
+    )
 
 
 def test_voice_engine_v0_generates_valid_voice_plan():

@@ -28,9 +28,9 @@ class ThumbnailEngineV0:
         )
 
         target = ThumbnailTarget(
-            brand_id=production_plan.source.brand_id,
-            channel=production_plan.source.channel,
-            platform=production_plan.source.platform,
+            brand_id=production_plan.target.brand_id,
+            channel=production_plan.target.channel,
+            platform=production_plan.target.platform,
         )
 
         title = getattr(production_plan, "title", "Untitled Content")

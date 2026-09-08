@@ -27,21 +27,31 @@ class AnalyticsEngineV0:
         now = datetime.now(timezone.utc).isoformat()
 
         if metrics is None:
+            metrics = AnalyticsMetrics()
+
+        elif isinstance(metrics, dict):
             metrics = AnalyticsMetrics(
-                views=0,
-                impressions=0,
-                ctr=0.0,
-                watch_time_seconds=0.0,
-                average_view_duration_seconds=0.0,
-                likes=0,
-                comments=0,
-                shares=0,
-                subscribers_gained=0,
-                revenue=0.0,
+                views=metrics.get("views", 0),
+                impressions=metrics.get("impressions", 0),
+                ctr=metrics.get("ctr", 0.0),
+                watch_time_seconds=metrics.get("watch_time_seconds", 0.0),
+                average_view_duration_seconds=metrics.get(
+                    "average_view_duration_seconds", 0.0
+                ),
+                likes=metrics.get("likes", 0),
+                comments=metrics.get("comments", 0),
+                shares=metrics.get("shares", 0),
+                subscribers_gained=metrics.get("subscribers_gained", 0),
+                revenue=metrics.get("revenue", 0.0),
+            )
+
+        elif not isinstance(metrics, AnalyticsMetrics):
+            raise TypeError(
+                "metrics must be None, a dict, or an AnalyticsMetrics instance"
             )
 
         source = AnalyticsSource(
-            publish_plan_id=publish_plan.publish_id,
+            publish_plan_id=publish_plan.publish_plan_id,
             approval_id=publish_plan.source.approval_id,
             production_plan_id=publish_plan.source.production_plan_id,
             thumbnail_plan_id=publish_plan.source.thumbnail_plan_id,

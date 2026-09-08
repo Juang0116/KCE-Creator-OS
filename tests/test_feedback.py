@@ -24,7 +24,7 @@ class MockTarget:
 
 
 class MockPublishPlan:
-    publish_id = "publish_001"
+    publish_plan_id = "publish_001"
     source = MockSource()
     target = MockTarget()
 

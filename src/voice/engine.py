@@ -30,103 +30,108 @@ class VoiceEngineV0:
         source = VoicePlanSource(
             script_id=script.script_id,
             storyboard_id="",
-            idea_id=script.source["idea_id"],
-            opportunity_id=script.source["opportunity_id"],
-            signal_id=script.source["signal_id"],
+            idea_id=script.source.idea_id,
+            opportunity_id=script.source.opportunity_id,
+            signal_id=script.source.signal_id,
         )
 
         target = VoicePlanTarget(
-            brand_id=script.target["brand_id"],
-            channel=script.target["channel"],
-            platform=script.target["platform"],
+            brand_id=script.target.brand_id,
+            channel=script.target.channel,
+            platform=script.target.platform,
         )
 
         segments = []
 
         segment_index = 1
 
-        if script.hook["narration"].strip():
+        # Hook
+        if script.hook.narration.strip():
             segments.append(
                 VoiceSegment(
                     segment_id=f"voice_segment_{segment_index}",
                     section_id="hook",
-                    text=script.hook["narration"],
+                    text=script.hook.narration,
                     language=voice_profile.language,
                     emotion="engaging",
                     delivery="natural",
                     estimated_duration_seconds=self._estimate_duration(
-                        script.hook["narration"]
+                        script.hook.narration
                     ),
                     status="planned",
                 )
             )
             segment_index += 1
 
-        if script.introduction.strip():
+        # Introduction
+        if script.introduction.narration.strip():
             segments.append(
                 VoiceSegment(
                     segment_id=f"voice_segment_{segment_index}",
                     section_id="introduction",
-                    text=script.introduction,
+                    text=script.introduction.narration,
                     language=voice_profile.language,
                     emotion="clear",
                     delivery="natural",
                     estimated_duration_seconds=self._estimate_duration(
-                        script.introduction
+                        script.introduction.narration
                     ),
                     status="planned",
                 )
             )
             segment_index += 1
 
+        # Sections
         for section in script.sections:
-            if not section["narration"].strip():
+            if not section.narration.strip():
                 continue
 
             segments.append(
                 VoiceSegment(
                     segment_id=f"voice_segment_{segment_index}",
-                    section_id=section["section_id"],
-                    text=section["narration"],
+                    section_id=section.section_id,
+                    text=section.narration,
                     language=voice_profile.language,
                     emotion="informative",
                     delivery="natural",
                     estimated_duration_seconds=self._estimate_duration(
-                        section["narration"]
+                        section.narration
                     ),
                     status="planned",
                 )
             )
             segment_index += 1
 
-        if script.conclusion.strip():
+        # Conclusion
+        if script.conclusion.narration.strip():
             segments.append(
                 VoiceSegment(
                     segment_id=f"voice_segment_{segment_index}",
                     section_id="conclusion",
-                    text=script.conclusion,
+                    text=script.conclusion.narration,
                     language=voice_profile.language,
                     emotion="conclusive",
                     delivery="natural",
                     estimated_duration_seconds=self._estimate_duration(
-                        script.conclusion
+                        script.conclusion.narration
                     ),
                     status="planned",
                 )
             )
             segment_index += 1
 
-        if script.cta.strip():
+        # CTA
+        if script.cta.narration.strip():
             segments.append(
                 VoiceSegment(
                     segment_id=f"voice_segment_{segment_index}",
                     section_id="cta",
-                    text=script.cta,
+                    text=script.cta.narration,
                     language=voice_profile.language,
                     emotion="inviting",
                     delivery="natural",
                     estimated_duration_seconds=self._estimate_duration(
-                        script.cta
+                        script.cta.narration
                     ),
                     status="planned",
                 )
@@ -158,7 +163,6 @@ class VoiceEngineV0:
         """
 
         words = len(text.split())
-
         duration = round((words / 150) * 60)
 
         return max(1, duration)

@@ -8,6 +8,9 @@ class MockProductionSource:
     idea_id = "idea_001"
     opportunity_id = "opportunity_001"
     signal_id = "signal_001"
+
+
+class MockProductionTarget:
     brand_id = "brand_001"
     channel = "Futuro Tech"
     platform = "YouTube"
@@ -16,6 +19,7 @@ class MockProductionSource:
 class MockProductionPlan:
     production_plan_id = "production_001"
     source = MockProductionSource()
+    target = MockProductionTarget()
     title = "The Future of AI"
 
 
