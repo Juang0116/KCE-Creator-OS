@@ -1,4 +1,5 @@
 from src.radar.config import RSSFeedConfig
+from src.radar.deduplication import RadarDeduplicator
 from src.radar.radar import RadarV0
 from src.radar.runner import RadarRunner
 
@@ -59,3 +60,33 @@ def test_radar_runner_processes_enabled_feeds(monkeypatch):
     assert len(signals) == 1
     assert signals[0].title == "Signal from Enabled Feed"
     assert signals[0].url == "https://example.com/enabled.xml"
+
+
+def test_radar_runner_filters_duplicate_signals(monkeypatch):
+    feeds = [
+        RSSFeedConfig(
+            name="Test Feed",
+            url="https://example.com/feed.xml",
+            language="en",
+            enabled=True,
+        ),
+    ]
+
+    monkeypatch.setattr(
+        "src.radar.runner.RSSSource",
+        FakeRSSSource,
+    )
+
+    deduplicator = RadarDeduplicator()
+
+    runner = RadarRunner(
+        feeds=feeds,
+        radar=RadarV0(),
+        deduplicator=deduplicator,
+    )
+
+    first_run = runner.run()
+    second_run = runner.run()
+
+    assert len(first_run) == 1
+    assert len(second_run) == 0
