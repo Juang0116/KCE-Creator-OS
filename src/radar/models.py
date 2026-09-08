@@ -20,6 +20,8 @@ class RadarSignal:
     topics: list[str] = field(default_factory=list)
     language: str = "es"
 
+    evidence: dict = field(default_factory=dict)
+
     niches: list[str] = field(default_factory=list)
     relevance_reason: str = ""
 
@@ -51,9 +53,7 @@ class RadarSignal:
                 "topics": self.topics,
                 "language": self.language,
             },
-            "evidence": {
-                "observations": []
-            },
+            "evidence": self.evidence,
             "relevance": {
                 "niches": self.niches,
                 "relevance_reason": self.relevance_reason,

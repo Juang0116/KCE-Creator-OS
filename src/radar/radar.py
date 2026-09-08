@@ -12,10 +12,8 @@ class RadarV0:
     En esta primera versión no consulta APIs externas.
     """
 
-
     def __init__(self, radar_version: str = "0.1.0"):
         self.radar_version = radar_version
-
 
     def collect(self, raw_signals: list[dict]) -> list[RadarSignal]:
         """
@@ -30,7 +28,6 @@ class RadarV0:
             signals.append(signal)
 
         return signals
-
 
     def _normalize_signal(self, raw_signal: dict) -> RadarSignal:
         """
@@ -55,6 +52,11 @@ class RadarV0:
             keywords=raw_signal.get("keywords", []),
             topics=raw_signal.get("topics", []),
             language=raw_signal.get("language", "es"),
+
+            evidence=raw_signal.get(
+                "evidence",
+                {}
+            ),
 
             niches=raw_signal.get("niches", []),
             relevance_reason=raw_signal.get(
