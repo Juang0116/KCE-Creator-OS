@@ -59,7 +59,7 @@ class ExecutionEngineV0:
         source = storyboard.source
 
         return ExecutionLineage(
-            storyboard_id=source.storyboard_id,
+            storyboard_id=storyboard.storyboard_id,
             script_id=source.script_id,
             idea_id=source.idea_id,
             opportunity_id=source.opportunity_id,
@@ -102,7 +102,7 @@ class ExecutionEngineV0:
         """
 
         created_at = self._now()
-        execution_id = f"execution_{storyboard.source.storyboard_id}"
+        execution_id = f"execution_{storyboard.storyboard_id}"
 
         lineage = self._lineage_from_storyboard(storyboard)
         stages = []
