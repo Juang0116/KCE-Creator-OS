@@ -77,7 +77,7 @@ class AnalyticsEngineV0:
         )
 
         return AnalyticsRecord(
-            schema_version=1.0,
+            schema_version="1.0",
             analytics_id=f"analytics_{content_id}",
             created_at=now,
             analytics_version="1",

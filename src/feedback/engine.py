@@ -88,7 +88,7 @@ class FeedbackEngineV0:
         )
 
         return FeedbackRecord(
-            schema_version=1.0,
+            schema_version="1.0",
             feedback_id=f"feedback_{learning_record.target.content_id}",
             created_at=now,
             feedback_version="1",

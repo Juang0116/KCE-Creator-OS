@@ -84,7 +84,7 @@ class LearningProcessing:
 
 @dataclass
 class LearningRecord:
-    schema_version: float
+    schema_version: str
     learning_id: str
     created_at: str
     learning_version: str

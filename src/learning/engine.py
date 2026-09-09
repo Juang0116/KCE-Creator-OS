@@ -127,7 +127,7 @@ class LearningEngineV0:
         )
 
         return LearningRecord(
-            schema_version=1.0,
+            schema_version="1.0",
             learning_id=f"learning_{analytics_record.target.content_id}",
             created_at=now,
             learning_version="1",

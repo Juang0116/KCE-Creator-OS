@@ -70,7 +70,7 @@ class FeedbackProcessing:
 
 @dataclass
 class FeedbackRecord:
-    schema_version: float
+    schema_version: str
     feedback_id: str
     created_at: str
     feedback_version: str

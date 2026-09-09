@@ -16,7 +16,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 1.0
+      "const": "1.0"
     },
     "learning_id": {
       "type": "string",
