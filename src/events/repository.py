@@ -1,70 +1,42 @@
 from __future__ import annotations
 
-from src.events import Event
-from src.persistence import MemoryRepository, Repository
+from .models import Event
 
 
 class EventRepository:
-    """
-    Repository specialized for Event objects.
+    """In-memory repository for Event objects."""
 
-    V0 uses the existing generic Repository abstraction
-    with an in-memory implementation.
-    """
-
-    def __init__(
-        self,
-        repository: Repository[Event] | None = None,
-    ) -> None:
-        self.repository = (
-            repository
-            if repository is not None
-            else MemoryRepository[Event]()
-        )
+    def __init__(self) -> None:
+        self._events: dict[str, Event] = {}
 
     def save(self, event: Event) -> Event:
         if not event.event_id:
-            raise ValueError(
-                "Event ID must not be empty."
-            )
+            raise ValueError("Event ID must not be empty.")
 
-        return self.repository.save(
-            event.event_id,
-            event,
-        )
+        self._events[event.event_id] = event
+        return event
 
-    def get(
-        self,
-        event_id: str,
-    ) -> Event | None:
+    def get(self, event_id: str) -> Event | None:
         if not event_id:
-            raise ValueError(
-                "Event ID must not be empty."
-            )
+            raise ValueError("Event ID must not be empty.")
 
-        return self.repository.get(event_id)
+        return self._events.get(event_id)
 
-    def exists(
-        self,
-        event_id: str,
-    ) -> bool:
+    def exists(self, event_id: str) -> bool:
         if not event_id:
-            raise ValueError(
-                "Event ID must not be empty."
-            )
+            raise ValueError("Event ID must not be empty.")
 
-        return self.repository.exists(event_id)
+        return event_id in self._events
 
-    def delete(
-        self,
-        event_id: str,
-    ) -> bool:
+    def delete(self, event_id: str) -> bool:
         if not event_id:
-            raise ValueError(
-                "Event ID must not be empty."
-            )
+            raise ValueError("Event ID must not be empty.")
 
-        return self.repository.delete(event_id)
+        if event_id not in self._events:
+            return False
+
+        del self._events[event_id]
+        return True
 
     def list_all(self) -> list[Event]:
-        return self.repository.list_all()
+        return list(self._events.values())

@@ -1,5 +1,6 @@
 from src.discovery import DiscoveryEngineV0
 from src.discovery_approval import DiscoveryApprovalEngineV0
+from src.events import EventRepository
 from src.orchestration import (
     DiscoveryPackage,
     DiscoveryWorkflowV0,
@@ -190,3 +191,181 @@ def test_discovery_workflow_supports_dependency_injection():
     assert package.discovery is discovery
     assert package.approval is not None
     assert fake_approval_engine.called is True
+
+
+def test_discovery_workflow_records_events_for_valid_discovery():
+    brand = make_brand()
+    signal = make_signal()
+
+    event_repository = EventRepository()
+
+    workflow = DiscoveryWorkflowV0(
+        event_repository=event_repository,
+    )
+
+    package = workflow.run(
+        signal=signal,
+        brand=brand,
+    )
+
+    events = event_repository.list_all()
+
+    assert len(events) == 2
+
+    event_types = {
+        event.event_type
+        for event in events
+    }
+
+    assert event_types == {
+        "discovery.created",
+        "discovery_approval.requested",
+    }
+
+    discovery_event = next(
+        event
+        for event in events
+        if event.event_type == "discovery.created"
+    )
+
+    approval_event = next(
+        event
+        for event in events
+        if event.event_type
+        == "discovery_approval.requested"
+    )
+
+    assert (
+        discovery_event.entity_type
+        == "discovery"
+    )
+
+    assert (
+        discovery_event.entity_id
+        == package.discovery.discovery_id
+    )
+
+    assert (
+        discovery_event.payload["signal_id"]
+        == signal.signal_id
+    )
+
+    assert (
+        discovery_event.payload["opportunity_id"]
+        == package.discovery.opportunity.opportunity_id
+    )
+
+    assert (
+        discovery_event.payload["idea_id"]
+        == package.discovery.idea.idea_id
+    )
+
+    assert (
+        approval_event.entity_type
+        == "discovery_approval"
+    )
+
+    assert (
+        approval_event.entity_id
+        == package.approval.approval_id
+    )
+
+    assert (
+        approval_event.payload["approval_id"]
+        == package.approval.approval_id
+    )
+
+    assert (
+        approval_event.payload["discovery_id"]
+        == package.discovery.discovery_id
+    )
+
+
+def test_discovery_workflow_records_filtered_event():
+    brand = make_brand()
+    signal = make_irrelevant_signal()
+
+    event_repository = EventRepository()
+
+    workflow = DiscoveryWorkflowV0(
+        event_repository=event_repository,
+    )
+
+    package = workflow.run(
+        signal=signal,
+        brand=brand,
+    )
+
+    events = event_repository.list_all()
+
+    assert len(events) == 1
+
+    event = events[0]
+
+    assert (
+        event.event_type
+        == "discovery.filtered"
+    )
+
+    assert (
+        event.entity_type
+        == "discovery"
+    )
+
+    assert (
+        event.entity_id
+        == package.discovery.discovery_id
+    )
+
+    assert (
+        event.payload["discovery_id"]
+        == package.discovery.discovery_id
+    )
+
+    assert (
+        event.payload["signal_id"]
+        == signal.signal_id
+    )
+
+    assert (
+        event.payload["idea_id"]
+        == ""
+    )
+
+
+def test_discovery_workflow_accepts_custom_event_repository():
+    brand = make_brand()
+    signal = make_signal()
+
+    class RecordingEventRepository:
+        def __init__(self):
+            self.events = []
+
+        def save(self, event):
+            self.events.append(event)
+            return event
+
+    event_repository = RecordingEventRepository()
+
+    workflow = DiscoveryWorkflowV0(
+        event_repository=event_repository,
+    )
+
+    package = workflow.run(
+        signal=signal,
+        brand=brand,
+    )
+
+    assert package.approval is not None
+
+    assert len(event_repository.events) == 2
+
+    assert (
+        event_repository.events[0].event_type
+        == "discovery.created"
+    )
+
+    assert (
+        event_repository.events[1].event_type
+        == "discovery_approval.requested"
+    )
