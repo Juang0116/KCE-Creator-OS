@@ -41,22 +41,156 @@ class SupabaseDiscoveryPackageRepository(
     """
     Supabase-backed repository for DiscoveryPackage objects.
 
-    The complete domain aggregate is persisted inside the
-    payload JSONB column while important lineage fields are
-    duplicated as queryable database columns.
+    V1 persistence strategy:
+
+    - Persist upstream domain entities in normalized tables:
+        signals
+        opportunities
+        content_ideas
+
+    - Persist the discovery aggregate in:
+        discoveries
+
+    - Persist the optional discovery approval in:
+        discovery_approvals
+
+    - Keep the complete DiscoveryPackage snapshot inside
+      discoveries.payload for stable aggregate reconstruction.
+
+    Reads intentionally continue to use the aggregate snapshot.
+    Normalized tables are currently used for persistence and
+    future querying, not for aggregate reconstruction.
     """
 
     TABLE_NAME = "discoveries"
+    SIGNALS_TABLE = "signals"
+    OPPORTUNITIES_TABLE = "opportunities"
+    CONTENT_IDEAS_TABLE = "content_ideas"
+    APPROVALS_TABLE = "discovery_approvals"
 
     def __init__(self, client: Client) -> None:
         self.client = client
 
     # ------------------------------------------------------------------
-    # Serialization
+    # Table helpers
+    # ------------------------------------------------------------------
+
+    def _table(self, table_name: str) -> Any:
+        return (
+            self.client
+            .schema("creator_os")
+            .table(table_name)
+        )
+
+    # ------------------------------------------------------------------
+    # Normalized serialization
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _row_from_package(
+    def _row_from_signal(
+        signal: RadarSignal,
+    ) -> dict[str, Any]:
+        data = signal.to_dict()
+
+        source = data.get("source", {})
+        signal_data = data.get("signal", {})
+
+        return {
+            "signal_id": signal.signal_id,
+            "created_at": signal.detected_at,
+            "brand_id": None,
+            "channel": None,
+            "platform": source.get("platform"),
+            "source": source.get("type"),
+            "title": signal_data.get("title"),
+            "url": source.get("url"),
+            "payload": data,
+        }
+
+    @staticmethod
+    def _row_from_opportunity(
+        opportunity: Opportunity,
+    ) -> dict[str, Any]:
+        data = opportunity.to_dict()
+
+        source = data.get("source", {})
+        target = data.get("target", {})
+        scoring = data.get("scoring", {})
+        analysis = data.get("analysis", {})
+
+        return {
+            "opportunity_id": opportunity.opportunity_id,
+            "created_at": opportunity.created_at,
+            "signal_id": source.get("signal_id"),
+            "brand_id": target.get("brand_id"),
+            "channel": target.get("channel"),
+            "platform": target.get("platform"),
+            "total_score": scoring.get("total_score"),
+            "recommendation": analysis.get(
+                "recommendation"
+            ),
+            "payload": data,
+        }
+
+    @staticmethod
+    def _row_from_content_idea(
+        idea: ContentIdea,
+    ) -> dict[str, Any]:
+        data = idea.to_dict()
+
+        source = data.get("source", {})
+        target = data.get("target", {})
+        concept = data.get("concept", {})
+
+        return {
+            "idea_id": idea.idea_id,
+            "created_at": idea.created_at,
+            "opportunity_id": source.get(
+                "opportunity_id"
+            ),
+            "signal_id": source.get("signal_id"),
+            "brand_id": target.get("brand_id"),
+            "channel": target.get("channel"),
+            "platform": target.get("platform"),
+            "concept": concept.get("working_title"),
+            "payload": data,
+        }
+
+    @staticmethod
+    def _row_from_approval(
+        approval: DiscoveryApproval,
+    ) -> dict[str, Any]:
+        data = approval.to_dict()
+
+        source = data.get("source", {})
+        decision = data.get("decision", {})
+
+        return {
+            "approval_id": approval.approval_id,
+            "created_at": approval.created_at,
+            "discovery_id": source.get(
+                "discovery_id"
+            ),
+            "idea_id": source.get("idea_id"),
+            "status": decision.get(
+                "status",
+                "pending",
+            ),
+            "decided_by": decision.get(
+                "decided_by"
+            ),
+            "decided_at": decision.get(
+                "decided_at"
+            ),
+            "notes": decision.get(
+                "notes",
+                "",
+            ),
+            "payload": data,
+        }
+
+    @staticmethod
+    def _row_from_discovery(
         package: DiscoveryPackage,
     ) -> dict[str, Any]:
         discovery = package.discovery
@@ -68,45 +202,36 @@ class SupabaseDiscoveryPackageRepository(
         return {
             "discovery_id": discovery.discovery_id,
             "created_at": discovery.created_at,
-
             "idea_id": (
                 idea.idea_id
                 if idea is not None
                 else None
             ),
-
             "opportunity_id": (
                 opportunity.opportunity_id
             ),
-
             "signal_id": signal.signal_id,
-
             "approval_id": (
                 approval.approval_id
                 if approval is not None
                 else None
             ),
-
             "brand_id": (
                 idea.brand_id
                 if idea is not None
                 else discovery.brand_evaluation.brand_id
             ),
-
             "channel": (
                 idea.channel
                 if idea is not None
                 else ""
             ),
-
             "platform": (
                 idea.platform
                 if idea is not None
                 else signal.platform
             ),
-
             "status": discovery.processing.status,
-
             "payload": package.to_dict(),
         }
 
@@ -173,7 +298,10 @@ class SupabaseDiscoveryPackageRepository(
                 "matched_topics",
                 [],
             ),
-            reason=data.get("reason", ""),
+            reason=data.get(
+                "reason",
+                "",
+            ),
             rule_flags=data.get(
                 "rule_flags",
                 [],
@@ -419,8 +547,11 @@ class SupabaseDiscoveryPackageRepository(
     def _discovery_from_dict(
         data: dict[str, Any],
     ) -> DiscoveryResult:
-        signal = SupabaseDiscoveryPackageRepository._signal_from_dict(
-            data["signal"]
+        signal = (
+            SupabaseDiscoveryPackageRepository
+            ._signal_from_dict(
+                data["signal"]
+            )
         )
 
         brand_evaluation = (
@@ -441,7 +572,9 @@ class SupabaseDiscoveryPackageRepository(
 
         idea = (
             SupabaseDiscoveryPackageRepository
-            ._content_idea_from_dict(idea_data)
+            ._content_idea_from_dict(
+                idea_data
+            )
             if idea_data is not None
             else None
         )
@@ -595,6 +728,24 @@ class SupabaseDiscoveryPackageRepository(
         )
 
     # ------------------------------------------------------------------
+    # Approval cleanup
+    # ------------------------------------------------------------------
+
+    def _delete_approvals_for_discovery(
+        self,
+        discovery_id: str,
+    ) -> None:
+        (
+            self._table(self.APPROVALS_TABLE)
+            .delete()
+            .eq(
+                "discovery_id",
+                discovery_id,
+            )
+            .execute()
+        )
+
+    # ------------------------------------------------------------------
     # Repository contract
     # ------------------------------------------------------------------
 
@@ -617,18 +768,87 @@ class SupabaseDiscoveryPackageRepository(
                 "DiscoveryPackage.discovery.discovery_id."
             )
 
-        row = self._row_from_package(value)
+        discovery = value.discovery
+        signal = discovery.signal
+        opportunity = discovery.opportunity
+        idea = discovery.idea
+        approval = value.approval
 
+        # --------------------------------------------------------------
+        # 1. Persist RadarSignal
+        # --------------------------------------------------------------
         (
-            self.client
-            .schema("creator_os")
-            .table(self.TABLE_NAME)
+            self._table(self.SIGNALS_TABLE)
             .upsert(
-                row,
+                self._row_from_signal(signal),
+                on_conflict="signal_id",
+            )
+            .execute()
+        )
+
+        # --------------------------------------------------------------
+        # 2. Persist Opportunity
+        # --------------------------------------------------------------
+        (
+            self._table(self.OPPORTUNITIES_TABLE)
+            .upsert(
+                self._row_from_opportunity(
+                    opportunity
+                ),
+                on_conflict="opportunity_id",
+            )
+            .execute()
+        )
+
+        # --------------------------------------------------------------
+        # 3. Persist ContentIdea when present
+        # --------------------------------------------------------------
+        if idea is not None:
+            (
+                self._table(self.CONTENT_IDEAS_TABLE)
+                .upsert(
+                    self._row_from_content_idea(
+                        idea
+                    ),
+                    on_conflict="idea_id",
+                )
+                .execute()
+            )
+
+        # --------------------------------------------------------------
+        # 4. Persist Discovery aggregate snapshot
+        # --------------------------------------------------------------
+        (
+            self._table(self.TABLE_NAME)
+            .upsert(
+                self._row_from_discovery(value),
                 on_conflict="discovery_id",
             )
             .execute()
         )
+
+        # --------------------------------------------------------------
+        # 5. Persist DiscoveryApproval when present
+        #
+        # Remove previous approvals for this discovery first.
+        # Approval IDs are generated independently, so simply upserting
+        # a new approval could otherwise leave an orphaned old approval.
+        # --------------------------------------------------------------
+        self._delete_approvals_for_discovery(
+            discovery.discovery_id
+        )
+
+        if approval is not None:
+            (
+                self._table(self.APPROVALS_TABLE)
+                .upsert(
+                    self._row_from_approval(
+                        approval
+                    ),
+                    on_conflict="approval_id",
+                )
+                .execute()
+            )
 
         return value
 
@@ -642,11 +862,12 @@ class SupabaseDiscoveryPackageRepository(
             )
 
         response = (
-            self.client
-            .schema("creator_os")
-            .table(self.TABLE_NAME)
+            self._table(self.TABLE_NAME)
             .select("payload")
-            .eq("discovery_id", key)
+            .eq(
+                "discovery_id",
+                key,
+            )
             .limit(1)
             .execute()
         )
@@ -668,11 +889,12 @@ class SupabaseDiscoveryPackageRepository(
             )
 
         response = (
-            self.client
-            .schema("creator_os")
-            .table(self.TABLE_NAME)
+            self._table(self.TABLE_NAME)
             .select("discovery_id")
-            .eq("discovery_id", key)
+            .eq(
+                "discovery_id",
+                key,
+            )
             .limit(1)
             .execute()
         )
@@ -688,12 +910,20 @@ class SupabaseDiscoveryPackageRepository(
                 "Repository key must not be empty."
             )
 
+        # Approval belongs to the discovery aggregate,
+        # while signal/opportunity/idea are upstream entities
+        # that may be shared and therefore remain untouched.
+        self._delete_approvals_for_discovery(
+            key
+        )
+
         response = (
-            self.client
-            .schema("creator_os")
-            .table(self.TABLE_NAME)
+            self._table(self.TABLE_NAME)
             .delete()
-            .eq("discovery_id", key)
+            .eq(
+                "discovery_id",
+                key,
+            )
             .execute()
         )
 
@@ -703,9 +933,7 @@ class SupabaseDiscoveryPackageRepository(
         self,
     ) -> list[DiscoveryPackage]:
         response = (
-            self.client
-            .schema("creator_os")
-            .table(self.TABLE_NAME)
+            self._table(self.TABLE_NAME)
             .select("payload")
             .execute()
         )
