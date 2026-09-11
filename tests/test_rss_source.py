@@ -2,10 +2,12 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+import pytest
 from jsonschema import Draft202012Validator
 
 from src.radar import RadarV0
 from src.radar.config import RSSFeedConfig
+from src.radar.sources import RSSRadarSource
 from src.radar.sources.rss import RSSSource
 
 
@@ -46,8 +48,8 @@ def test_rss_source_parses_item(monkeypatch):
     )
 
     feed_config = RSSFeedConfig(
-    name="KCE Test Feed",
-    url="https://example.com/feed.xml",
+        name="KCE Test Feed",
+        url="https://example.com/feed.xml",
     )
 
     source = RSSSource(feed_config)
@@ -148,3 +150,48 @@ def test_rss_source_integrates_with_radar_and_schema(
     assert not errors, "\n".join(
         error.message for error in errors
     )
+
+
+def test_rss_radar_source_preserves_feed_url_as_evidence(
+    monkeypatch,
+):
+    class MockResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            return False
+
+        def read(self):
+            return SAMPLE_RSS.encode("utf-8")
+
+    def mock_urlopen(request, timeout):
+        return MockResponse()
+
+    monkeypatch.setattr(
+        "src.radar.sources.rss.urlopen",
+        mock_urlopen,
+    )
+
+    source = RSSRadarSource(
+        feed_url="https://example.com/feed.xml",
+    )
+
+    signals = source.fetch()
+
+    assert signals[0]["evidence"] == {
+        "feed_url": "https://example.com/feed.xml"
+    }
+
+
+def test_rss_radar_source_requires_feed_url():
+    with pytest.raises(ValueError):
+        RSSRadarSource("")
+
+
+def test_rss_radar_source_requires_positive_timeout():
+    with pytest.raises(ValueError):
+        RSSRadarSource(
+            "https://example.com/feed.xml",
+            timeout=0,
+        )

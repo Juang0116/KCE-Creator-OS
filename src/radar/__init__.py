@@ -3,6 +3,8 @@ from .radar import RadarV0
 from .sources import (
     ManualRadarSource,
     RadarSource,
+    RSSRadarSource,
+    RSSSource,
 )
 
 __all__ = [
@@ -10,4 +12,6 @@ __all__ = [
     "RadarV0",
     "ManualRadarSource",
     "RadarSource",
+    "RSSSource",
+    "RSSRadarSource",
 ]

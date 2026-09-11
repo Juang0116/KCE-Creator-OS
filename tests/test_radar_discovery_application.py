@@ -1,6 +1,8 @@
+from unittest.mock import patch
+
 from src.application import RadarDiscoveryApplicationServiceV0
 from src.radar import RadarV0
-from src.radar.sources import ManualRadarSource
+from src.radar.sources import ManualRadarSource, RSSRadarSource
 
 
 class FakeDiscoveryFacade:
@@ -34,6 +36,44 @@ def make_raw_signal(title: str, signal_suffix: str) -> dict:
         "niches": ["technology"],
         "relevance_reason": "Relevant test signal.",
     }
+
+
+class FakeHTTPResponse:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return False
+
+    def read(self):
+        return RSS_PAYLOAD
+
+
+RSS_PAYLOAD = b"""
+<rss version="2.0">
+    <channel>
+        <title>Test Feed</title>
+
+        <item>
+            <title>First RSS Signal</title>
+            <description>This is the first signal.</description>
+            <link>https://example.com/first</link>
+            <author>author@example.com</author>
+            <pubDate>Wed, 10 Sep 2026 12:00:00 GMT</pubDate>
+            <category>technology, AI</category>
+        </item>
+
+        <item>
+            <title>Second RSS Signal</title>
+            <description>This is the second signal.</description>
+            <link>https://example.com/second</link>
+            <author>author@example.com</author>
+            <pubDate>Wed, 10 Sep 2026 13:00:00 GMT</pubDate>
+            <category>gaming</category>
+        </item>
+    </channel>
+</rss>
+"""
 
 
 def test_source_is_consumed_by_radar_and_discovery():
@@ -118,3 +158,39 @@ def test_empty_source_produces_no_discoveries():
 
     assert packages == []
     assert discovery.received_signals == []
+
+
+def test_rss_source_can_run_through_radar_and_discovery():
+    source = RSSRadarSource(
+        feed_url="https://example.com/feed.xml"
+    )
+
+    discovery = FakeDiscoveryFacade()
+
+    service = RadarDiscoveryApplicationServiceV0(
+        radar=RadarV0(),
+        discovery=discovery,
+    )
+
+    with patch(
+        "src.radar.sources.rss.urlopen",
+        return_value=FakeHTTPResponse(),
+    ):
+        packages = service.run(
+            source=source,
+            brand={"brand_id": "brand_test"},
+        )
+
+    assert len(packages) == 2
+    assert len(discovery.received_signals) == 2
+
+    first = discovery.received_signals[0]
+    second = discovery.received_signals[1]
+
+    assert first.title == "First RSS Signal"
+    assert first.source_type == "rss"
+    assert first.platform == "rss"
+
+    assert second.title == "Second RSS Signal"
+    assert second.source_type == "rss"
+    assert second.platform == "rss"

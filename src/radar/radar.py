@@ -32,6 +32,10 @@ class RadarV0:
     def _normalize_signal(self, raw_signal: dict) -> RadarSignal:
         """
         Convierte una señal cruda individual en RadarSignal.
+
+        La evidencia se normaliza al contrato canónico de
+        RadarSignal, evitando que metadata específica de una
+        fuente se filtre al modelo final.
         """
 
         detected_at = datetime.now(timezone.utc).isoformat()
@@ -53,9 +57,8 @@ class RadarV0:
             topics=raw_signal.get("topics", []),
             language=raw_signal.get("language", "es"),
 
-            evidence=raw_signal.get(
-                "evidence",
-                {}
+            evidence=self._normalize_evidence(
+                raw_signal.get("evidence", {})
             ),
 
             niches=raw_signal.get("niches", []),
@@ -68,3 +71,29 @@ class RadarV0:
             confidence=raw_signal.get("confidence", 0.5),
             processed_at=None,
         )
+
+    @staticmethod
+    def _normalize_evidence(evidence: dict) -> dict:
+        """
+        Conserva únicamente las propiedades permitidas por
+        el contrato canónico de RadarSignal.evidence.
+
+        Las fuentes pueden transportar metadata adicional
+        en sus raw signals, pero esa metadata no forma parte
+        del contrato final de RadarSignal.
+        """
+
+        if not isinstance(evidence, dict):
+            return {}
+
+        allowed_keys = {
+            "engagement",
+            "mentions",
+            "observations",
+        }
+
+        return {
+            key: value
+            for key, value in evidence.items()
+            if key in allowed_keys
+        }
