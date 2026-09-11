@@ -1,10 +1,12 @@
 from unittest.mock import patch
 
 from src.application import (
+    DiscoveryFacadeV0,
     DiscoveryApplicationServiceV0,
     DiscoveryQueryServiceV0,
 )
 from src.bootstrap import (
+    create_discovery,
     create_discovery_application,
     create_discovery_query,
 )
@@ -180,3 +182,28 @@ def test_create_discovery_query_reads_from_repository():
         )
 
     assert result is package
+
+def test_create_discovery_wires_facade():
+
+    fake_client = object()
+
+    with patch(
+        "src.bootstrap.discovery.create_supabase_client",
+        return_value=fake_client,
+    ):
+        discovery = create_discovery()
+
+    assert isinstance(
+        discovery,
+        DiscoveryFacadeV0,
+    )
+
+    assert isinstance(
+        discovery.application_service,
+        DiscoveryApplicationServiceV0,
+    )
+
+    assert isinstance(
+        discovery.query_service,
+        DiscoveryQueryServiceV0,
+    )
