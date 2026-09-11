@@ -1,27 +1,5 @@
-from .models import (
-    Script,
-    ScriptSource,
-    ScriptTarget,
-    ScriptMetadata,
-    ScriptHook,
-    ScriptIntroduction,
-    ScriptClaim,
-    ScriptSection,
-    ScriptConclusion,
-    ScriptCTA,
-    ScriptProcessing,
-)
+from .engine import ScriptEngineV0
 
 __all__ = [
-    "Script",
-    "ScriptSource",
-    "ScriptTarget",
-    "ScriptMetadata",
-    "ScriptHook",
-    "ScriptIntroduction",
-    "ScriptClaim",
-    "ScriptSection",
-    "ScriptConclusion",
-    "ScriptCTA",
-    "ScriptProcessing",
+    "ScriptEngineV0",
 ]
