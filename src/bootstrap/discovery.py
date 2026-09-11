@@ -1,6 +1,7 @@
-from __future__ import annotations
-
-from src.application import DiscoveryApplicationServiceV0
+from src.application import (
+    DiscoveryApplicationServiceV0,
+    DiscoveryQueryServiceV0,
+)
 from src.integrations.supabase import (
     SupabaseDiscoveryPackageRepository,
     SupabaseEventRepository,
@@ -11,21 +12,9 @@ from src.persistence import DiscoveryPackageRepository
 
 
 def create_discovery_application() -> DiscoveryApplicationServiceV0:
-    """
-    Build the production Discovery application.
-
-    Composition root for the Discovery vertical slice.
-
-    Infrastructure dependencies are assembled here so that
-    application and orchestration layers remain independent
-    from concrete Supabase implementations.
-    """
-
     client = create_supabase_client()
 
-    event_repository = SupabaseEventRepository(
-        client
-    )
+    event_repository = SupabaseEventRepository(client)
 
     package_repository = DiscoveryPackageRepository(
         SupabaseDiscoveryPackageRepository(client)
@@ -38,4 +27,16 @@ def create_discovery_application() -> DiscoveryApplicationServiceV0:
     return DiscoveryApplicationServiceV0(
         workflow=workflow,
         package_repository=package_repository,
+    )
+
+
+def create_discovery_query() -> DiscoveryQueryServiceV0:
+    client = create_supabase_client()
+
+    package_repository = DiscoveryPackageRepository(
+        SupabaseDiscoveryPackageRepository(client)
+    )
+
+    return DiscoveryQueryServiceV0(
+        package_repository=package_repository
     )
