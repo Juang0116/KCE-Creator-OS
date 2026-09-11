@@ -1,25 +1,20 @@
 from __future__ import annotations
 
 from src.orchestration import DiscoveryPackage
-from src.radar import RadarV0
+from src.radar import RadarV0, RadarSource
 
 from .discovery_facade import DiscoveryFacadeV0
 
 
 class RadarDiscoveryApplicationServiceV0:
     """
-    Application service que conecta Radar V0 con Discovery.
+    Application service that connects a RadarSource with Discovery.
 
-    Flujo:
-
-        raw signals
-            -> RadarV0
-            -> RadarSignal
-            -> DiscoveryFacadeV0
-            -> DiscoveryPackage
-
-    Este servicio no contiene lógica de dominio.
-    Su responsabilidad es coordinar ambos módulos.
+    RadarSource
+        -> RadarV0
+        -> RadarSignal
+        -> DiscoveryFacadeV0
+        -> DiscoveryPackage
     """
 
     def __init__(
@@ -32,19 +27,19 @@ class RadarDiscoveryApplicationServiceV0:
 
     def run(
         self,
-        raw_signals: list[dict],
+        source: RadarSource,
         brand: dict,
     ) -> list[DiscoveryPackage]:
+        raw_signals = source.fetch()
         signals = self.radar.collect(raw_signals)
 
-        packages = []
+        packages: list[DiscoveryPackage] = []
 
         for signal in signals:
             package = self.discovery.run(
                 signal=signal,
                 brand=brand,
             )
-
             packages.append(package)
 
         return packages
