@@ -3,10 +3,15 @@ from fastapi.testclient import TestClient
 from src.api.app import app
 from src.application import (
     DiscoveryApplicationServiceV0,
+    DiscoveryApprovalApplicationServiceV0,
     DiscoveryFacadeV0,
     DiscoveryQueryServiceV0,
 )
 from src.api.dependencies import get_discovery
+from src.discovery_approval import (
+    DiscoveryApprovalDecisionWorkflowV0,
+)
+from src.events import EventRepository
 from src.persistence import (
     DiscoveryPackageRepository,
     MemoryRepository,
@@ -33,12 +38,24 @@ def make_test_facade() -> DiscoveryFacadeV0:
         package_repository=package_repository,
     )
 
+    event_repository = EventRepository()
+
+    decision_workflow = DiscoveryApprovalDecisionWorkflowV0(
+        event_repository=event_repository,
+    )
+
+    approval_service = DiscoveryApprovalApplicationServiceV0(
+        decision_workflow=decision_workflow,
+        package_repository=package_repository,
+    )
+
     query_service = DiscoveryQueryServiceV0(
         package_repository=package_repository,
     )
 
     return DiscoveryFacadeV0(
         application_service=application_service,
+        approval_service=approval_service,
         query_service=query_service,
     )
 

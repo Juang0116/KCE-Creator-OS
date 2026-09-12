@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from src.application import (
+    DiscoveryApprovalApplicationServiceV0,
     DiscoveryFacadeV0,
     DiscoveryApplicationServiceV0,
     DiscoveryQueryServiceV0,
@@ -183,8 +184,8 @@ def test_create_discovery_query_reads_from_repository():
 
     assert result is package
 
-def test_create_discovery_wires_facade():
 
+def test_create_discovery_wires_facade():
     fake_client = object()
 
     with patch(
@@ -201,6 +202,11 @@ def test_create_discovery_wires_facade():
     assert isinstance(
         discovery.application_service,
         DiscoveryApplicationServiceV0,
+    )
+
+    assert isinstance(
+        discovery.approval_service,
+        DiscoveryApprovalApplicationServiceV0,
     )
 
     assert isinstance(

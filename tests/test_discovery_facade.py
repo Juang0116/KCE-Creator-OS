@@ -1,8 +1,13 @@
 from src.application import (
     DiscoveryApplicationServiceV0,
+    DiscoveryApprovalApplicationServiceV0,
     DiscoveryFacadeV0,
     DiscoveryQueryServiceV0,
 )
+from src.discovery_approval import (
+    DiscoveryApprovalDecisionWorkflowV0,
+)
+from src.events import EventRepository
 from src.persistence import (
     DiscoveryPackageRepository,
     MemoryRepository,
@@ -29,12 +34,24 @@ def make_facade():
         package_repository=package_repository,
     )
 
+    event_repository = EventRepository()
+
+    decision_workflow = DiscoveryApprovalDecisionWorkflowV0(
+        event_repository=event_repository,
+    )
+
+    approval_service = DiscoveryApprovalApplicationServiceV0(
+        decision_workflow=decision_workflow,
+        package_repository=package_repository,
+    )
+
     query_service = DiscoveryQueryServiceV0(
         package_repository=package_repository,
     )
 
     facade = DiscoveryFacadeV0(
         application_service=application_service,
+        approval_service=approval_service,
         query_service=query_service,
     )
 
@@ -52,6 +69,54 @@ def test_facade_run_returns_discovery_package():
     assert package.discovery is not None
     assert package.discovery.idea is not None
     assert package.approval is not None
+
+
+def test_facade_decide_approved_updates_package():
+    facade = make_facade()
+
+    package = facade.run(
+        signal=make_signal(),
+        brand=make_brand(),
+    )
+
+    result = facade.decide(
+        discovery_id=package.discovery.discovery_id,
+        decision="approved",
+        decided_by="juancho",
+        notes="Approved for research.",
+    )
+
+    assert result is package
+    assert result.approval is not None
+    assert result.approval.decision.status == "approved"
+    assert result.approval.decision.decided_by == "juancho"
+    assert result.approval.decision.notes == (
+        "Approved for research."
+    )
+
+
+def test_facade_decide_rejected_updates_package():
+    facade = make_facade()
+
+    package = facade.run(
+        signal=make_signal(),
+        brand=make_brand(),
+    )
+
+    result = facade.decide(
+        discovery_id=package.discovery.discovery_id,
+        decision="rejected",
+        decided_by="juancho",
+        notes="Rejected for current strategy.",
+    )
+
+    assert result is package
+    assert result.approval is not None
+    assert result.approval.decision.status == "rejected"
+    assert result.approval.decision.decided_by == "juancho"
+    assert result.approval.decision.notes == (
+        "Rejected for current strategy."
+    )
 
 
 def test_facade_get_returns_persisted_package():
