@@ -1,0 +1,155 @@
+
+========================================================================
+KCE CREATOR OS — FUTURO TECH RADAR V0
+========================================================================
+
+========================================================================
+FUTURO TECH — FEED CONFIGURATION
+========================================================================
+OpenAI News
+  URL: https://openai.com/news/rss.xml
+  Language: en
+  Status: ENABLED
+
+Google DeepMind
+  URL: https://deepmind.google/blog/rss.xml
+  Language: en
+  Status: ENABLED
+
+Hugging Face Blog
+  URL: https://huggingface.co/blog/feed.xml
+  Language: en
+  Status: ENABLED
+
+NVIDIA Blog
+  URL: https://blogs.nvidia.com/feed/
+  Language: en
+  Status: ENABLED
+
+
+========================================================================
+RADAR REPLAY
+========================================================================
+Loading persisted signals from:
+C:\Users\Juancho\OneDrive\Documentos\KCE Creator OS\data\radar\futuro_tech_signals.jsonl
+
+Signals loaded from store: 2168
+
+========================================================================
+SIGNAL RE-ENRICHMENT
+========================================================================
+Re-enriching persisted signals in memory...
+Signals re-enriched: 2168
+Persisted JSONL store was not modified.
+
+========================================================================
+DISCOVERY EXECUTION
+========================================================================
+Signals processed: 2168
+Content opportunities: 736
+Filtered: 1432
+
+========================================================================
+TOP FUTURO TECH OPPORTUNITIES
+========================================================================
+
+1. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'Team update'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 70.00/100
+   Recommendation: candidate
+   Signal: Team update
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, machine learning, software
+   Approval: pending
+
+2. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'Scientific computing in the age of agentic AI'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: Scientific computing in the age of agentic AI
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+3. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'HP Inc. launches Frontier strategic partnership with OpenAI'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: HP Inc. launches Frontier strategic partnership with OpenAI
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+4. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'How Endava is redesigning software delivery around AI agents'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: How Endava is redesigning software delivery around AI agents
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+5. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'Sea's View on the Future of Agentic Software Development with Codex'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: Sea's View on the Future of Agentic Software Development with Codex
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+6. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'Simplex rethinks software development with Codex'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: Simplex rethinks software development with Codex
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+7. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'AI fundamentals'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: AI fundamentals
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, artificial intelligence
+   Approval: pending
+
+8. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'Introducing the Codex app'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: Introducing the Codex app
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+9. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'Introducing Aardvark: OpenAI’s agentic security researcher'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: Introducing Aardvark: OpenAI’s agentic security researcher
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+10. ContentConcept(working_title="La señal detectada indica actividad relevante alrededor de 'OpenAI acquires Software Applications Incorporated, maker of Sky'.", hook='Hay una señal que está generando interés y merece una explicación.', core_promise='Explicar por qué esta oportunidad es relevante para la audiencia.', angle='La oportunidad encaja con los pilares de la marca: AI.', format='explainer', estimated_duration_seconds=600, content_pillar='technology')
+   Score: 67.50/100
+   Recommendation: candidate
+   Signal: OpenAI acquires Software Applications Incorporated, maker of Sky
+   Source: rss
+   Matched pillars: AI
+   Matched topics: AI, software
+   Approval: pending
+
+========================================================================
+EXECUTION SUMMARY
+========================================================================
+Stored signals: 2168
+Opportunities: 736
+Filtered: 1432
+
+Radar execution completed successfully.
+
+Next step: inspect the real opportunities before changing the scoring system.

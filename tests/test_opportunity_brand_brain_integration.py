@@ -1,3 +1,5 @@
+import pytest
+
 from src.brand_brain import BrandBrainV0
 from src.opportunity import OpportunityEngineV0
 from src.radar import RadarSignal
@@ -104,7 +106,12 @@ def test_brand_brain_to_opportunity_engine():
     assert opportunity.signal_id == signal.signal_id
     assert opportunity.brand_id == brand["brand_id"]
 
-    assert opportunity.scoring.relevance == evaluation.relevance_score
+    # Brand Brain uses a 0-100 relevance scale.
+    # Opportunity Engine uses 0-10 for each scoring dimension.
+    assert opportunity.scoring.relevance == pytest.approx(
+        evaluation.relevance_score / 10
+    )
+
     assert opportunity.processing.confidence == evaluation.confidence
 
     assert opportunity.analysis.recommendation in {
@@ -155,5 +162,10 @@ def test_irrelevant_signal_does_not_become_strong_candidate():
     )
 
     assert evaluation.relevant is False
-    assert opportunity.scoring.relevance == evaluation.relevance_score
+
+    # Same scale conversion: Brand Brain 0-100 → Opportunity 0-10.
+    assert opportunity.scoring.relevance == pytest.approx(
+        evaluation.relevance_score / 10
+    )
+
     assert opportunity.scoring.total_score < 80

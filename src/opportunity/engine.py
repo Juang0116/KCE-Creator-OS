@@ -62,8 +62,10 @@ class OpportunityEngineV0:
         brand: dict,
         brand_evaluation: BrandEvaluation,
     ) -> OpportunityScoring:
+        # Brand Brain relevance is 0-100.
+        # Opportunity scoring dimensions are 0-10.
         relevance = min(
-            max(brand_evaluation.relevance_score, 0.0),
+            max(brand_evaluation.relevance_score / 10.0, 0.0),
             10.0,
         )
 
@@ -72,17 +74,25 @@ class OpportunityEngineV0:
             brand,
         )
 
-        trend_strength = self._calculate_trend_strength(signal)
-
-        novelty = self._calculate_novelty(signal)
-
-        production_feasibility = self._calculate_production_feasibility(
-            signal,
-            brand,
+        trend_strength = self._calculate_trend_strength(
+            signal
         )
 
-        evergreen_potential = self._calculate_evergreen_potential(
+        novelty = self._calculate_novelty(
             signal
+        )
+
+        production_feasibility = (
+            self._calculate_production_feasibility(
+                signal,
+                brand,
+            )
+        )
+
+        evergreen_potential = (
+            self._calculate_evergreen_potential(
+                signal
+            )
         )
 
         total_score = (
@@ -95,7 +105,7 @@ class OpportunityEngineV0:
         ) / 60 * 100
 
         return OpportunityScoring(
-            relevance=relevance,
+            relevance=round(relevance, 2),
             audience_fit=audience_fit,
             trend_strength=trend_strength,
             novelty=novelty,
@@ -135,7 +145,10 @@ class OpportunityEngineV0:
     def _calculate_trend_strength(
         signal: RadarSignal,
     ) -> float:
-        engagement = signal.evidence.get("engagement", {})
+        engagement = signal.evidence.get(
+            "engagement",
+            {},
+        )
 
         views = engagement.get("views")
         likes = engagement.get("likes")
@@ -144,7 +157,12 @@ class OpportunityEngineV0:
 
         values = [
             value
-            for value in (views, likes, comments, shares)
+            for value in (
+                views,
+                likes,
+                comments,
+                shares,
+            )
             if isinstance(value, (int, float))
         ]
 
@@ -155,10 +173,13 @@ class OpportunityEngineV0:
 
         if total_engagement >= 1_000_000:
             return 10.0
+
         if total_engagement >= 100_000:
             return 8.0
+
         if total_engagement >= 10_000:
             return 6.5
+
         if total_engagement >= 1_000:
             return 5.0
 
@@ -185,13 +206,20 @@ class OpportunityEngineV0:
     ) -> float:
         source_type = signal.source_type.lower()
 
-        if source_type in {"rss", "news", "forum"}:
+        if source_type in {
+            "rss",
+            "news",
+            "forum",
+        }:
             return 8.0
 
-        if source_type in {"social", "search"}:
+        if source_type in {
+            "social",
+            "search",
+        }:
             return 7.0
 
-        if source_type in {"video"}:
+        if source_type == "video":
             return 6.0
 
         return 5.0
@@ -241,8 +269,8 @@ class OpportunityEngineV0:
         signal: RadarSignal,
     ) -> str:
         return (
-            f"La señal detectada indica actividad relevante alrededor "
-            f"de '{signal.title}'."
+            f"La señal detectada indica actividad relevante "
+            f"alrededor de '{signal.title}'."
         )
 
     @staticmethod
@@ -268,7 +296,10 @@ class OpportunityEngineV0:
     def _get_channel(
         brand: dict,
     ) -> str:
-        channels = brand.get("channels_community", {})
+        channels = brand.get(
+            "channels_community",
+            {},
+        )
 
         primary_platforms = channels.get(
             "primary_platforms",
