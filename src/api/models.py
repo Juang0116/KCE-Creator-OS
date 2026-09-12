@@ -17,3 +17,14 @@ class DiscoveryRunResponse(BaseModel):
 
 class DiscoveryListResponse(BaseModel):
     discoveries: list[dict[str, Any]]
+
+
+class DiscoveryApprovalRequest(BaseModel):
+    decision: str
+    decided_by: str
+    notes: str = ""
+
+
+class DiscoveryApprovalResponse(BaseModel):
+    discovery: dict[str, Any]
+    approval: dict[str, Any] | None

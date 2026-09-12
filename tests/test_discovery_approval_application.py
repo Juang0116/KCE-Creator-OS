@@ -272,7 +272,7 @@ def test_empty_decided_by_is_rejected_and_not_persisted():
 
     service, repository, event_repository = build_service(package)
 
-    with pytest.raises(ValueError, match="decided_by cannot be empty"):
+    with pytest.raises(ValueError, match="decided_by must not be empty"):
         service.decide(
             discovery_id="discovery_test_001",
             decision="approved",

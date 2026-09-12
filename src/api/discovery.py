@@ -5,8 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.application import DiscoveryFacadeV0
 from src.radar import RadarSignal
 
-from .dependencies import get_discovery
+from .dependencies import get_discovery as get_discovery_dependency
 from .models import (
+    DiscoveryApprovalRequest,
+    DiscoveryApprovalResponse,
     DiscoveryListResponse,
     DiscoveryRunRequest,
     DiscoveryRunResponse,
@@ -66,7 +68,9 @@ def _build_signal(data: dict) -> RadarSignal:
 )
 def run_discovery(
     request: DiscoveryRunRequest,
-    discovery: DiscoveryFacadeV0 = Depends(get_discovery),
+    discovery: DiscoveryFacadeV0 = Depends(
+        get_discovery_dependency
+    ),
 ) -> DiscoveryRunResponse:
     signal = _build_signal(request.signal)
 
@@ -90,7 +94,9 @@ def run_discovery(
     response_model=DiscoveryListResponse,
 )
 def list_discoveries(
-    discovery: DiscoveryFacadeV0 = Depends(get_discovery),
+    discovery: DiscoveryFacadeV0 = Depends(
+        get_discovery_dependency
+    ),
 ) -> DiscoveryListResponse:
     packages = discovery.list_all()
 
@@ -108,7 +114,9 @@ def list_discoveries(
 )
 def get_discovery(
     discovery_id: str,
-    discovery: DiscoveryFacadeV0 = Depends(get_discovery),
+    discovery: DiscoveryFacadeV0 = Depends(
+        get_discovery_dependency
+    ),
 ) -> DiscoveryRunResponse:
     package = discovery.get(discovery_id)
 
@@ -119,6 +127,51 @@ def get_discovery(
         )
 
     return DiscoveryRunResponse(
+        discovery=package.discovery.to_dict(),
+        approval=(
+            package.approval.to_dict()
+            if package.approval is not None
+            else None
+        ),
+    )
+
+
+@router.post(
+    "/{discovery_id}/approval",
+    response_model=DiscoveryApprovalResponse,
+)
+def decide_discovery_approval(
+    discovery_id: str,
+    request: DiscoveryApprovalRequest,
+    discovery: DiscoveryFacadeV0 = Depends(
+        get_discovery_dependency
+    ),
+) -> DiscoveryApprovalResponse:
+    try:
+        package = discovery.decide(
+            discovery_id=discovery_id,
+            decision=request.decision,
+            decided_by=request.decided_by,
+            notes=request.notes,
+        )
+    except ValueError as exc:
+        message = str(exc)
+
+        if message in {
+            "DiscoveryPackage was not found.",
+            "Discovery not found.",
+        }:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=message,
+            ) from exc
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=message,
+        ) from exc
+
+    return DiscoveryApprovalResponse(
         discovery=package.discovery.to_dict(),
         approval=(
             package.approval.to_dict()

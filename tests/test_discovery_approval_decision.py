@@ -147,7 +147,7 @@ def test_empty_decided_by_is_rejected():
 
     with pytest.raises(
         ValueError,
-        match="decided_by cannot be empty",
+        match="decided_by must not be empty",
     ):
         engine.decide(
             approval=approval,

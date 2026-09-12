@@ -189,3 +189,170 @@ def test_list_discoveries_returns_packages():
 
     assert package_1.discovery.discovery_id in ids
     assert package_2.discovery.discovery_id in ids
+
+
+def test_post_discovery_approval_approves_package():
+    facade = make_test_facade()
+
+    package = facade.run(
+        signal=make_signal(),
+        brand=make_brand(),
+    )
+
+    client = make_client(facade)
+
+    try:
+        response = client.post(
+            f"/discovery/{package.discovery.discovery_id}/approval",
+            json={
+                "decision": "approved",
+                "decided_by": "juancho",
+                "notes": "Approved for research.",
+            },
+        )
+    finally:
+        cleanup_dependencies()
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert (
+        body["discovery"]["discovery_id"]
+        == package.discovery.discovery_id
+    )
+
+    assert body["approval"] is not None
+    assert body["approval"]["decision"]["status"] == (
+        "approved"
+    )
+    assert body["approval"]["decision"]["decided_by"] == (
+        "juancho"
+    )
+    assert body["approval"]["decision"]["notes"] == (
+        "Approved for research."
+    )
+
+
+def test_post_discovery_approval_rejects_package():
+    facade = make_test_facade()
+
+    package = facade.run(
+        signal=make_signal(),
+        brand=make_brand(),
+    )
+
+    client = make_client(facade)
+
+    try:
+        response = client.post(
+            f"/discovery/{package.discovery.discovery_id}/approval",
+            json={
+                "decision": "rejected",
+                "decided_by": "juancho",
+                "notes": "Rejected for current strategy.",
+            },
+        )
+    finally:
+        cleanup_dependencies()
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert (
+        body["discovery"]["discovery_id"]
+        == package.discovery.discovery_id
+    )
+
+    assert body["approval"] is not None
+    assert body["approval"]["decision"]["status"] == (
+        "rejected"
+    )
+    assert body["approval"]["decision"]["decided_by"] == (
+        "juancho"
+    )
+    assert body["approval"]["decision"]["notes"] == (
+        "Rejected for current strategy."
+    )
+
+
+def test_post_discovery_approval_missing_discovery_returns_404():
+    facade = make_test_facade()
+    client = make_client(facade)
+
+    try:
+        response = client.post(
+            "/discovery/discovery_missing/approval",
+            json={
+                "decision": "approved",
+                "decided_by": "juancho",
+                "notes": "Approved.",
+            },
+        )
+    finally:
+        cleanup_dependencies()
+
+    assert response.status_code == 404
+
+    assert response.json()["detail"] == (
+        "DiscoveryPackage was not found."
+    )
+
+
+def test_post_discovery_approval_invalid_decision_returns_400():
+    facade = make_test_facade()
+
+    package = facade.run(
+        signal=make_signal(),
+        brand=make_brand(),
+    )
+
+    client = make_client(facade)
+
+    try:
+        response = client.post(
+            f"/discovery/{package.discovery.discovery_id}/approval",
+            json={
+                "decision": "maybe",
+                "decided_by": "juancho",
+                "notes": "Invalid decision.",
+            },
+        )
+    finally:
+        cleanup_dependencies()
+
+    assert response.status_code == 400
+
+    assert response.json()["detail"] == (
+        "Decision must be 'approved' or 'rejected'."
+    )
+
+
+def test_post_discovery_approval_empty_decided_by_returns_400():
+    facade = make_test_facade()
+
+    package = facade.run(
+        signal=make_signal(),
+        brand=make_brand(),
+    )
+
+    client = make_client(facade)
+
+    try:
+        response = client.post(
+            f"/discovery/{package.discovery.discovery_id}/approval",
+            json={
+                "decision": "approved",
+                "decided_by": "",
+                "notes": "Missing reviewer.",
+            },
+        )
+    finally:
+        cleanup_dependencies()
+
+    assert response.status_code == 400
+
+    assert response.json()["detail"] == (
+        "decided_by must not be empty."
+    )

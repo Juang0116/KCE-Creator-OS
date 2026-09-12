@@ -32,7 +32,7 @@ class DiscoveryApprovalDecisionEngineV0:
             )
 
         if not decided_by:
-            raise ValueError("decided_by cannot be empty.")
+            raise ValueError("decided_by must not be empty.")
 
         if approval.decision.status != "pending":
             raise ValueError(
