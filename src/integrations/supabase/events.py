@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 from supabase import Client
@@ -25,6 +26,24 @@ class SupabaseEventRepository:
             .schema("creator_os")
             .table(self.TABLE_NAME)
         )
+
+    @staticmethod
+    def _normalize_created_at(value: str) -> str:
+        """
+        Normalize persisted ISO timestamps to the canonical format
+        produced by Event.create().
+
+        Supabase/PostgREST may return fractional seconds with fewer
+        than six digits when trailing zeroes are omitted. The domain
+        Event model uses datetime.isoformat(), which emits exactly
+        six microsecond digits when microseconds are present.
+        """
+        if not value:
+            return value
+
+        parsed = datetime.fromisoformat(value)
+
+        return parsed.isoformat()
 
     def save(self, event: Event) -> Event:
         if not event.event_id:
@@ -66,13 +85,17 @@ class SupabaseEventRepository:
         if not response.data:
             return None
 
+        row = response.data[0]
+
         return Event(
-            event_id=response.data[0]["event_id"],
-            created_at=response.data[0]["created_at"],
-            event_type=response.data[0]["event_type"],
-            entity_type=response.data[0]["entity_type"],
-            entity_id=response.data[0]["entity_id"],
-            payload=response.data[0].get(
+            event_id=row["event_id"],
+            created_at=self._normalize_created_at(
+                row["created_at"]
+            ),
+            event_type=row["event_type"],
+            entity_type=row["entity_type"],
+            entity_id=row["entity_id"],
+            payload=row.get(
                 "payload",
                 {},
             ),
@@ -131,7 +154,9 @@ class SupabaseEventRepository:
         return [
             Event(
                 event_id=row["event_id"],
-                created_at=row["created_at"],
+                created_at=self._normalize_created_at(
+                    row["created_at"]
+                ),
                 event_type=row["event_type"],
                 entity_type=row["entity_type"],
                 entity_id=row["entity_id"],
